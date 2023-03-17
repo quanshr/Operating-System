@@ -25,7 +25,7 @@ void mips_detect_memory() {
 
 	/* Step 2: Calculate the corresponding 'npage' value. */
 	/* Exercise 2.1: Your code here. */
-	npage = memsize / sizeof(struct Page) + (memsize % sizeof(struct Page) != 0);
+	npage = memsize / BY2PG;
 
 	printk("Memory size: %lu KiB, number of pages: %lu\n", memsize / 1024, npage);
 }
