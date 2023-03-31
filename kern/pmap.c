@@ -95,7 +95,7 @@ void page_init(void) {
 	/* Step 2: Align `freemem` up to multiple of BY2PG. */
 	/* Exercise 2.3: Your code here. (2/4) */
 	freemem = ROUND(freemem, BY2PG);
-	int alloc_page_num = PADDR(freemem) / BY2PG; 
+	int alloc_page_num = PADDR(freemem) / BY2PG;
 	/* Step 3: Mark all memory below `freemem` as used (set `pp_ref` to 1) */
 	/* Exercise 2.3: Your code here. (3/4) */
 	for (int i = 0; i < alloc_page_num; ++i) {
@@ -136,7 +136,6 @@ int page_alloc(struct Page **new) {
 	 * Hint: use `memset`. */
 	/* Exercise 2.4: Your code here. (2/2) */
 	memset((void *)page2kva(pp), 0, BY2PG);
-
 	*new = pp;
 	return 0;
 }
@@ -184,16 +183,18 @@ static int pgdir_walk(Pde *pgdir, u_long va, int create, Pte **ppte) {
 	/* Exercise 2.6: Your code here. (2/3) */
 	if (!((*pgdir_entryp) & PTE_V)) {
 		if (create) {
-			try(page_alloc(*pp));
-			int page_item = page2pa(pp) >> 
-		} else {
+			try(page_alloc(&pp));
+			*pgdir_entryp = page2pa(pp) | PTE_V | PTE_D;
+			pp->pp_ref++;
+		}
+		else {
 			*ppte = 0;
 			return 0;
 		}
 	}
 	/* Step 3: Assign the kernel virtual address of the page table entry to '*ppte'. */
 	/* Exercise 2.6: Your code here. (3/3) */
-
+	*ppte = (Pte *)(KADDR(PTE_ADDR(*pgdir_entryp))) + PTX(va);
 	return 0;
 }
 
@@ -227,15 +228,16 @@ int page_insert(Pde *pgdir, u_int asid, struct Page *pp, u_long va, u_int perm) 
 
 	/* Step 2: Flush TLB with 'tlb_invalidate'. */
 	/* Exercise 2.7: Your code here. (1/3) */
-
+	tlb_invalidate(asid, va);
 	/* Step 3: Re-get or create the page table entry. */
 	/* If failed to create, return the error. */
 	/* Exercise 2.7: Your code here. (2/3) */
-
+	try(pgdir_walk(pgdir, va, 1, &pte));
 	/* Step 4: Insert the page to the page table entry with 'perm | PTE_V' and increase its
 	 * 'pp_ref'. */
 	/* Exercise 2.7: Your code here. (3/3) */
-
+	*pte = page2pa(pp) | perm | PTE_V;
+	pp->pp_ref++;
 	return 0;
 }
 
