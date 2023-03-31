@@ -114,7 +114,11 @@
  */
 #define LIST_INSERT_AFTER(listelm, elm, field)                                                     \
 	/* Exercise 2.2: Your code here. */  \
-
+	do { \
+		(elm)->field.le_next = (listelm)->field.le_next; \
+		if ((elm)->field.le_next != NULL) { \
+			LIST
+	}
 /*
  * Insert the element "elm" *before* the element "listelm" which is
  * already in the list.  The "field" name is the link element
