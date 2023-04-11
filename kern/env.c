@@ -282,11 +282,9 @@ static int load_icode_mapper(void *data, u_long va, size_t offset, u_int perm, c
 	struct Env *env = (struct Env *)data;
 	struct Page *p;
 	int r;
-	printk("HOW\n");
 	/* Step 1: Allocate a page with 'page_alloc'. */
 	/* Exercise 3.5: Your code here. (1/2) */
 	page_alloc(&p);
-	printk("waht\n");
 	/* Step 2: If 'src' is not NULL, copy the 'len' bytes started at 'src' into 'offset' at this
 	 * page. */
 	// Hint: You may want to use 'memcpy'.
@@ -477,7 +475,7 @@ void env_run(struct Env *e) {
 	 *    returning to the kernel caller, making 'env_run' a 'noreturn' function as well.
 	 */
 	/* Exercise 3.8: Your code here. (2/2) */
-	env_pop_tf;
+	env_pop_tf(&(curenv->env_tf), curenv->env_asid);
 }
 
 void env_check() {
