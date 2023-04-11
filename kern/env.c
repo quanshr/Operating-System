@@ -294,9 +294,8 @@ static int load_icode_mapper(void *data, u_long va, size_t offset, u_int perm, c
 		/* Exercise 3.5: Your code here. (2/2) */
 		memcpy(page2kva(p) + offset, src, len);
 	}
-	printk("ppp\n");
 	/* Step 3: Insert 'p' into 'env->env_pgdir' at 'va' with 'perm'. */
-	return page_insert(&(env->env_pgdir), env->env_asid, p, va, perm);
+	return page_insert(env->env_pgdir, env->env_asid, p, va, perm);
 }
 
 /* Overview:
@@ -314,7 +313,6 @@ static void load_icode(struct Env *e, const void *binary, size_t size) {
 	/* Step 2: Load the segments using 'ELF_FOREACH_PHDR_OFF' and 'elf_load_seg'.
 	 * As a loader, we just care about loadable segments, so parse only program headers here.
 	 */
-	printk("u\n");
 	size_t ph_off;
 	ELF_FOREACH_PHDR_OFF (ph_off, ehdr) {
 		Elf32_Phdr *ph = (Elf32_Phdr *)(binary + ph_off);
@@ -322,12 +320,9 @@ static void load_icode(struct Env *e, const void *binary, size_t size) {
 			// 'elf_load_seg' is defined in lib/elfloader.c
 			// 'load_icode_mapper' defines the way in which a page in this segment
 			// should be mapped.
-			printk("y\n");
 			panic_on(elf_load_seg(ph, binary + ph->p_offset, load_icode_mapper, e));
-			printk("x\n");
 		}
 	}
-	printk("v\n");
 	/* Step 3: Set 'e->env_tf.cp0_epc' to 'ehdr->e_entry'. */
 	/* Exercise 3.6: Your code here. */
 	e->env_tf.cp0_epc = ehdr->e_entry;
@@ -350,12 +345,10 @@ struct Env *env_create(const void *binary, size_t size, int priority) {
 	/* Exercise 3.7: Your code here. (2/3) */
 	e->env_pri = priority;
 	e->env_status = ENV_RUNNABLE;
-	printk("123\n");
 	/* Step 3: Use 'load_icode' to load the image from 'binary', and insert 'e' into
 	 * 'env_sched_list' using 'TAILQ_INSERT_HEAD'. */
 	/* Exercise 3.7: Your code here. (3/3) */
 	load_icode(e, binary, size);
-	printk("4\n");
 	TAILQ_INSERT_HEAD(&env_sched_list, e, env_sched_link);
 	return e;
 }
@@ -458,7 +451,6 @@ extern void env_pop_tf(struct Trapframe *tf, u_int asid) __attribute__((noreturn
 void env_run(struct Env *e) {
 	assert(e->env_status == ENV_RUNNABLE);
 	pre_env_run(e); // WARNING: DO NOT MODIFY THIS LINE!
-
 	/* Step 1:
 	 *   If 'curenv' is NULL, this is the first time through.
 	 *   If not, we may be switching from a previous env, so save its context into
@@ -474,6 +466,7 @@ void env_run(struct Env *e) {
 
 	/* Step 3: Change 'cur_pgdir' to 'curenv->env_pgdir', switching to its address space. */
 	/* Exercise 3.8: Your code here. (1/2) */
+	cur_pgdir = curenv->env_pgdir;
 
 	/* Step 4: Use 'env_pop_tf' to restore the curenv's saved context (registers) and return/go
 	 * to user mode.
@@ -484,7 +477,7 @@ void env_run(struct Env *e) {
 	 *    returning to the kernel caller, making 'env_run' a 'noreturn' function as well.
 	 */
 	/* Exercise 3.8: Your code here. (2/2) */
-
+	env_pop_tf;
 }
 
 void env_check() {
