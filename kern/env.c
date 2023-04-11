@@ -78,7 +78,7 @@ static void map_segment(Pde *pgdir, u_int asid, u_long pa, u_long va, u_int size
 		 *  Use 'pa2page' to get the 'struct Page *' of the physical address.
 		 */
 		/* Exercise 3.2: Your code here. */
-		 page_insert(pgdir, asid, pa2page(pa + i), va, perm);
+		 page_insert(pgdir, asid, pa2page(pa + i), va + i, perm);
 	}
 }
 
@@ -229,13 +229,14 @@ static int env_setup_vm(struct Env *e) {
 int env_alloc(struct Env **new, u_int parent_id) {
 	int r;
 	struct Env *e;
-	printk("dsadsddd\n");
 	/* Step 1: Get a free Env from 'env_free_list' */
 	/* Exercise 3.4: Your code here. (1/4) */
 	e = LIST_FIRST(&env_free_list);
+	if (e == NULL) {
+		return -E_NO_FREE_ENV;
+	}
 	/* Step 2: Call a 'env_setup_vm' to initialize the user address space for this new Env. */
 	/* Exercise 3.4: Your code here. (2/4) */
-	printk("zheye\n");
 	env_setup_vm(e);
 	/* Step 3: Initialize these fields for the new Env with appropriate values:
 	 *   'env_user_tlb_mod_entry' (lab4), 'env_runs' (lab6), 'env_id' (lab3), 'env_asid' (lab3),
@@ -245,14 +246,11 @@ int env_alloc(struct Env **new, u_int parent_id) {
 	 *   Use 'asid_alloc' to allocate a free asid.
 	 *   Use 'mkenvid' to allocate a free envid.
 	 */
-	printk("wawa\n");
 	e->env_user_tlb_mod_entry = 0; // for lab4
 	e->env_runs = 0;	       // for lab6
 	/* Exercise 3.4: Your code here. (3/4) */
 	asid_alloc(&(e->env_asid));
-	printk("whh\n");
 	e->env_id = mkenvid(e);
-	printk("%d  %d\n", e->env_id, e->env_asid);
 	e->env_parent_id = parent_id;
 	/* Step 4: Initialize the sp and 'cp0_status' in 'e->env_tf'. */
 	// Timer interrupt (STATUS_IM4) will be enabled.
