@@ -284,7 +284,10 @@ static int load_icode_mapper(void *data, u_long va, size_t offset, u_int perm, c
 	int r;
 	/* Step 1: Allocate a page with 'page_alloc'. */
 	/* Exercise 3.5: Your code here. (1/2) */
-	page_alloc(&p);
+	r = page_alloc(&p);
+	if (r) {
+		return r;
+	}
 	/* Step 2: If 'src' is not NULL, copy the 'len' bytes started at 'src' into 'offset' at this
 	 * page. */
 	// Hint: You may want to use 'memcpy'.
