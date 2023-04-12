@@ -155,7 +155,7 @@ void env_init(void) {
 	 * list should be the same as they are in the 'envs' array. */
 
 	/* Exercise 3.1: Your code here. (2/2) */
-	for (int i = NENV - 1; i >= 0; --i) {
+	for (i = NENV - 1; i >= 0; --i) {
 		LIST_INSERT_HEAD(&env_free_list, &envs[i], env_link);
 	}
 	/*
