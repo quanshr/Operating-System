@@ -6,5 +6,7 @@ LEAF(msyscall)
 	/* Exercise 4.1: Your code here. */
 	nop
 	syscall
+	jr ra
+	nop
 
 END(msyscall)

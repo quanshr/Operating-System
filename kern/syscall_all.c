@@ -137,7 +137,7 @@ static inline int is_illegal_va_range(u_long va, u_int len) {
 int sys_mem_alloc(u_int envid, u_int va, u_int perm) {
 	struct Env *env;
 	struct Page *pp;
-
+	
 	/* Step 1: Check if 'va' is a legal user virtual address using 'is_illegal_va'. */
 	/* Exercise 4.4: Your code here. (1/3) */
 	if (is_illegal_va(va)) {
@@ -148,12 +148,14 @@ int sys_mem_alloc(u_int envid, u_int va, u_int perm) {
 	/* Step 2: Convert the envid to its corresponding 'struct Env *' using 'envid2env'. */
 	/* Hint: **Always** validate the permission in syscalls! */
 	/* Exercise 4.4: Your code here. (2/3) */
-	envid2env(envid, &env, 1);
+	if (envid2env(envid, &env, 1)) {
+		return -E_BAD_ENV;
+	}
 
 
 	/* Step 3: Allocate a physical page using 'page_alloc'. */
 	/* Exercise 4.4: Your code here. (3/3) */
-	page_alloc(pp);
+	page_alloc(&pp);
 
 
 	/* Step 4: Map the allocated page at 'va' with permission 'perm' using 'page_insert'. */
@@ -182,7 +184,7 @@ int sys_mem_map(u_int srcid, u_int srcva, u_int dstid, u_int dstva, u_int perm) 
 	/* Step 1: Check if 'srcva' and 'dstva' are legal user virtual addresses using
 	 * 'is_illegal_va'. */
 	/* Exercise 4.5: Your code here. (1/4) */
-	if (is_illegal_va(srcva) || is_illegal_va(dstid)) {
+	if (is_illegal_va(srcva) || is_illegal_va(dstva)) {
 		return -E_INVAL;
 	}
 
@@ -192,17 +194,18 @@ int sys_mem_map(u_int srcid, u_int srcva, u_int dstid, u_int dstva, u_int perm) 
 	if (envid2env(srcid, &srcenv, 1)) {
 		return -E_BAD_ENV;
 	}
-
+	
 	/* Step 3: Convert the 'dstid' to its corresponding 'struct Env *' using 'envid2env'. */
 	/* Exercise 4.5: Your code here. (3/4) */
 	if (envid2env(dstid, &dstenv, 1)) {
 		return -E_BAD_ENV;
 	}
-
+	
 	/* Step 4: Find the physical page mapped at 'srcva' in the address space of 'srcid'. */
 	/* Return -E_INVAL if 'srcva' is not mapped. */
 	/* Exercise 4.5: Your code here. (4/4) */
-	if (page_lookup(srcenv->env_pgdir, srcva, &pp)) {
+	pp = page_lookup(srcenv->env_pgdir, srcva, 0);
+	if (pp == NULL) {
 		return -E_INVAL;
 	}
 
