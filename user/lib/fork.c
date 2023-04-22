@@ -21,7 +21,7 @@ static void __attribute__((noreturn)) cow_entry(struct Trapframe *tf) {
 	/* Hint: Use 'vpt' and 'VPN' to find the page table entry. If the 'perm' doesn't have
 	 * 'PTE_COW', launch a 'user_panic'. */
 	/* Exercise 4.13: Your code here. (1/6) */
-	perm = vpt[PTX((PTE_ADDR(va)))];
+	perm = vpt[VPN((va))] & 0xfff;
 	if (!(perm & PTE_COW)) {
 		user_panic("NOT PTE_COW!!");
 	}
@@ -85,8 +85,8 @@ static void duppage(u_int envid, u_int vpn) {
 	/* Hint: Use 'vpt' to find the page table entry. */
 	/* Exercise 4.10: Your code here. (1/2) */
 	
-	addr = PTE_ADDR(vpn);
-	perm = vpt[PTX(addr)] & 0xfff;    // vpd[PDX(va)]
+	addr = vpn << PGSHIFT;
+	perm = vpt[vpn] & 0xfff;    // vpd[PDX(va)]
 
 
 	/* Step 2: If the page is writable, and not shared with children, and not marked as COW yet,
@@ -140,7 +140,7 @@ int fork(void) {
 	/* Step 3: Map all mapped pages below 'USTACKTOP' into the child's address space. */
 	// Hint: You should use 'duppage'.
 	/* Exercise 4.15: Your code here. (1/2) */
-	for (u_long vpn = USTACKTOP - BY2PG; vpn >= 0 ; vpn -= BY2PG) {
+	for (u_long vpn = (USTACKTOP >> PGSHIFT) - 1; vpn >= 0 ; --vpn) {
 		duppage(child, vpn);
 	}
 
