@@ -5,6 +5,7 @@ int main() {
 	int id = 0;
 	debugf("fktest on ostest!\n");
 	if ((id = fork()) == 0) {
+		debugf("  d %d\n", id);
 		if ((id = fork()) == 0) {
 			if ((id = fork()) == 0) {
 				if ((id = fork()) == 0) {
