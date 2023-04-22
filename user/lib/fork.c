@@ -95,13 +95,13 @@ static void duppage(u_int envid, u_int vpn) {
 	 */
 	/* Exercise 4.10: Your code here. (2/2) */
 	if (!(perm & PTE_D) || (perm & PTE_COW) || (perm & PTE_LIBRARY)) {
-		syscall_mem_map(env->env_parent_id, addr, envid, addr, perm);
+		syscall_mem_map(0, addr, envid, addr, perm);
 	}
 	else {
 		perm |= PTE_COW;
 		perm &= ~PTE_D;
-		syscall_mem_map(env->env_parent_id, addr, envid, addr, perm);
-		syscall_mem_map(env->env_parent_id, addr, env->env_parent_id, addr, perm);
+		syscall_mem_map(0, addr, envid, addr, perm);
+		syscall_mem_map(0, addr, 0, addr, perm);
 	}
 
 
@@ -140,7 +140,7 @@ int fork(void) {
 	/* Step 3: Map all mapped pages below 'USTACKTOP' into the child's address space. */
 	// Hint: You should use 'duppage'.
 	/* Exercise 4.15: Your code here. (1/2) */
-	for (u_long vpn = (USTACKTOP >> PGSHIFT) - 1; vpn >= 0 ; --vpn) {
+	for (u_long vpn = VPN(USTACKTOP) - 1; vpn >= 0 ; --vpn) {
 		duppage(child, vpn);
 	}
 
