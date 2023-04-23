@@ -140,8 +140,11 @@ int fork(void) {
 	/* Step 3: Map all mapped pages below 'USTACKTOP' into the child's address space. */
 	// Hint: You should use 'duppage'.
 	/* Exercise 4.15: Your code here. (1/2) */
-	for (u_long vpn = VPN(USTACKTOP) - 1; vpn >= 0 ; --vpn) {
-		duppage(child, vpn);
+	for (int vpn = VPN(USTACKTOP) - 1; vpn >= 0 ; --vpn) {
+		//debugf("%d \n" , vpn);
+		if ((vpd[vpn >> 10] & PTE_V) && (vpt[vpn] & PTE_V)) {
+			duppage(child, vpn);
+		}
 	}
 
 
