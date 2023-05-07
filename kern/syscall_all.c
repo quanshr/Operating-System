@@ -506,9 +506,22 @@ int sys_cgetc(void) {
  *	|    rtc     | 0x15000000 | 0x200  | (dev_rtc.h)
  *	* ---------------------------------*
  */
+
+int is_illegal_pa_range(u_int pa, u_int len) {
+	u_int console = 0x10000000, IDE_disk = 0x13000000, rtc = 0x15000000;
+	if (pa >= console && pa + len <= console + 0x20
+		|| pa >= IDE_disk && pa + len <= IDE_disk + 0x4200
+		|| pa >= rtc && pa + len <= rtc + 0x200) {
+		return 0;
+	}
+	return -E_INVAL;
+}
 int sys_write_dev(u_int va, u_int pa, u_int len) {
 	/* Exercise 5.1: Your code here. (1/2) */
-
+	if (is_illegal_va_range(va, len) || is_illegal_pa_range(pa, len)) {
+		return -E_INVAL;
+	}
+	memcpy(va, KSEG1 | pa, len);
 	return 0;
 }
 
@@ -525,7 +538,10 @@ int sys_write_dev(u_int va, u_int pa, u_int len) {
  */
 int sys_read_dev(u_int va, u_int pa, u_int len) {
 	/* Exercise 5.1: Your code here. (2/2) */
-
+	if (is_illegal_va_range(va, len) || is_illegal_pa_range(pa, len)) {
+		return -E_INVAL;
+	}
+	memcpy(KSEG1 | pa, va, len);
 	return 0;
 }
 
