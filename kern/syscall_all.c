@@ -538,10 +538,11 @@ int sys_write_dev(u_int va, u_int pa, u_int len) {
  */
 int sys_read_dev(u_int va, u_int pa, u_int len) {
 	/* Exercise 5.1: Your code here. (2/2) */
+	;
 	if (is_illegal_va_range(va, len) || is_illegal_pa_range(pa, len)) {
 		return -E_INVAL;
 	}
-	memcpy(va, KSEG1 | pa, len);
+	memcpy(va, KSEG1 + pa, len);
 	return 0;
 }
 
