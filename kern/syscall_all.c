@@ -521,7 +521,7 @@ int sys_write_dev(u_int va, u_int pa, u_int len) {
 	if (is_illegal_va_range(va, len) || is_illegal_pa_range(pa, len)) {
 		return -E_INVAL;
 	}
-	memcpy(va, KSEG1 | pa, len);
+	memcpy(KSEG1 | pa, va, len);
 	return 0;
 }
 
@@ -541,7 +541,7 @@ int sys_read_dev(u_int va, u_int pa, u_int len) {
 	if (is_illegal_va_range(va, len) || is_illegal_pa_range(pa, len)) {
 		return -E_INVAL;
 	}
-	memcpy(KSEG1 | pa, va, len);
+	memcpy(va, KSEG1 | pa, len);
 	return 0;
 }
 
