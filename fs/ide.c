@@ -93,10 +93,10 @@ void ide_write(u_int diskno, u_int secno, void *src, u_int nsecs) {
 		uint32_t offset = begin + off;
 		syscall_write_dev(&offset, DEV_DISK_ADDRESS + DEV_DISK_OFFSET, 4);
 
+		syscall_write_dev(src + off, DEV_DISK_ADDRESS + DEV_DISK_BUFFER, BY2SECT);
+
 		uint32_t op = DEV_DISK_OPERATION_WRITE;
-		syscall_write_dev(&op, DEV_DISK_ADDRESS + DEV_DISK_START_OPERATION, 4);
-		
-		syscall_write_dev(src + off, DEV_DISK_ADDRESS + DEV_DISK_BUFFER, BY2SECT);	
+		syscall_write_dev(&op, DEV_DISK_ADDRESS + DEV_DISK_START_OPERATION, 4);		
 		
 		uint32_t res;
 		syscall_read_dev(&res, DEV_DISK_ADDRESS + DEV_DISK_STATUS, 4);
