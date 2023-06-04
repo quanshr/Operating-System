@@ -117,7 +117,7 @@ int spawn(char *prog, char **argv) {
 	u_char elfbuf[512];
 	/* Exercise 6.4: Your code here. (1/6) */
 	
-	if (r = readn(fd, elfbuf, sizeof(Elf32_Ehdr)) != sizeof(Elf32_Ehdr)) {
+	if ((r = readn(fd, elfbuf, sizeof(Elf32_Ehdr))) != sizeof(Elf32_Ehdr)) {
 		goto err;
 	}
 
@@ -134,7 +134,7 @@ int spawn(char *prog, char **argv) {
 	u_int child;
 	/* Exercise 6.4: Your code here. (2/6) */
 
-	if (r = child = syscall_exofork() < 0) {
+	if ((r = child = syscall_exofork()) < 0) {
 		goto err;
 	}
 
@@ -144,7 +144,7 @@ int spawn(char *prog, char **argv) {
 	u_int sp;
 	/* Exercise 6.4: Your code here. (3/6) */
 
-	if (r = init_stack(child, argv, &sp) < 0) {
+	if ((r = init_stack(child, argv, &sp)) < 0) {
 		goto err1;
 	}
 
@@ -158,7 +158,7 @@ int spawn(char *prog, char **argv) {
 		// You may want to use 'seek' and 'readn'.
 		/* Exercise 6.4: Your code here. (4/6) */
 
-		if ((r = seek(fd, ph_off) < 0) || (r = readn(fd, elfbuf, ehdr->e_phentsize) < 0)) {
+		if ((r = seek(fd, ph_off)) < 0 || (r = readn(fd, elfbuf, ehdr->e_phentsize)) < 0) {
 			goto err1;
 		}
 
@@ -170,7 +170,7 @@ int spawn(char *prog, char **argv) {
 			// 'goto err1' if that fails.
 			/* Exercise 6.4: Your code here. (5/6) */
 
-			if (r = read_map(fd, ph->p_offset, &bin) < 0) {
+			if ((r = read_map(fd, ph->p_offset, &bin)) < 0) {
 				goto err1;
 			}
 
@@ -179,7 +179,7 @@ int spawn(char *prog, char **argv) {
 			// 'goto err1' if that fails.
 			/* Exercise 6.4: Your code here. (6/6) */
 			
-			if (r = elf_load_seg(ph, bin, spawn_mapper, &child) < 0) {
+			if ((r = elf_load_seg(ph, bin, spawn_mapper, &child)) < 0) {
 				goto err1;
 			}
 
