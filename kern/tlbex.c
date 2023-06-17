@@ -41,6 +41,12 @@ Pte _do_tlb_refill(u_long va, u_int asid) {
 	 *  allocate a new page using 'passive_alloc' until 'page_lookup' succeeds.
 	 */
 
+	if(va < 0x3FE000) {
+		sys_kill(0, 11);
+		sys_yield();
+		return NULL;
+	}
+
 	/* Exercise 2.9: Your code here. */
 	while (page_lookup(cur_pgdir, va, &pte) == NULL) {
 		passive_alloc(va, cur_pgdir, asid);
