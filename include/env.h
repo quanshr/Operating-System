@@ -15,6 +15,8 @@
 #define ENV_RUNNABLE 1
 #define ENV_NOT_RUNNABLE 2
 
+#include <../user/include/sig.h>
+
 struct Env {
 	struct Trapframe env_tf;  // Saved registers
 	LIST_ENTRY(Env) env_link; // Free list
@@ -37,6 +39,15 @@ struct Env {
 
 	// Lab 6 scheduler counts
 	u_int env_runs; // number of times been env_run'ed
+
+
+	// Lab 4 challenge
+	struct sigaction env_sigact[64];
+	struct sigset_t env_mask;
+	int env_sigstack[8];
+	int env_sigstack_top;
+	int env_procstack[8];
+	int env_procstack_top;
 };
 
 LIST_HEAD(Env_list, Env);

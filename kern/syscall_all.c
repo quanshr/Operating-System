@@ -564,6 +564,11 @@ void *syscall_table[MAX_SYSNO] = {
     [SYS_cgetc] = sys_cgetc,
     [SYS_write_dev] = sys_write_dev,
     [SYS_read_dev] = sys_read_dev,
+
+	[SYS_sigaction] = sys_sigaction,
+    [SYS_sigprocmask] = sys_sigprocmask,
+    [SYS_kill] = sys_kill,
+    [SYS_quit] = sys_quit,
 };
 
 /* Overview:
@@ -608,4 +613,49 @@ void do_syscall(struct Trapframe *tf) {
 	 */
 	/* Exercise 4.2: Your code here. (4/4) */
 	tf->regs[2] = func(arg1, arg2, arg3, arg4, arg5);
+}
+
+
+
+// Lab 4 challenge
+#include <../user/include/sig.h>
+
+int sys_sigaction(int signum, const struct sigaction *act, struct sigaction *oldact){
+	if (oldact!=NULL) {
+		*oldact=curenv->env_sigact[signum];
+	}
+	curenv->env_sigact[signum] = *act;
+	return 0;
+}
+int sys_sigprocmask(int how, const struct sigset_t *set, struct sigset_t *oldset){
+	if (oldset != NULL){
+		*oldset = curenv->env_mask;
+	}
+	switch (how) {
+		case 0:
+			curenv->env_mask.sig[0] |= set->sig[0];
+			curenv->env_mask.sig[1] |= set->sig[1];
+			break;
+		case 1:
+			curenv->env_mask.sig[0] &= (~(set->sig[0]));
+            curenv->env_mask.sig[1] &= (~(set->sig[1]));
+			break;
+		case 2:
+			curenv->env_mask.sig[0] = set->sig[0];
+            curenv->env_mask.sig[1] = set->sig[1];
+			break;
+	}
+	return 0;
+}
+
+int sys_kill(u_int envid, int sig) {
+	struct Env *e;
+	try(envid2env(envid,&e,0));
+	e->env_sigstack[e->env_sigstack_top] = sig;
+	++(e->env_sigstack_top);
+	return 0;
+}
+
+void sys_quit(){
+	--(curenv->env_procstack_top);
 }

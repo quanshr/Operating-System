@@ -477,6 +477,8 @@ void env_run(struct Env *e) {
 	curenv = e;
 	curenv->env_runs++; // lab6
 
+	do_sig();
+
 	/* Step 3: Change 'cur_pgdir' to 'curenv->env_pgdir', switching to its address space. */
 	/* Exercise 3.8: Your code here. (1/2) */
 	cur_pgdir = curenv->env_pgdir;
@@ -492,6 +494,26 @@ void env_run(struct Env *e) {
 	/* Exercise 3.8: Your code here. (2/2) */
 	env_pop_tf(&(curenv->env_tf), curenv->env_asid);
 }
+
+void do_sig() {
+	for(int i = (curenv->env_sigstack_top-1); i>-1; --i){
+		int signum = curenv->env_sigstack[i];
+		if((curenv->env_procstack_top&&!((curenv->env_sigact[curenv->env_procstack[curenv->env_procstack_top-1]].sa_mask.sig[signum>>5])&(1<<(signum&0x1f))))
+				||(!curenv->env_procstack_top&&!((curenv->env_mask.sig[signum>>5])&(1<<(signum&0x1f))))){
+			curenv->env_tf.regs[31]=curenv->env_tf.cp0_epc;
+			curenv->env_tf.regs[4]=signum;
+			curenv->env_tf.cp0_epc=curenv->env_sigact[signum].sa_handler;
+			curenv->env_procstack[curenv->env_procstack_top]=signum;
+			++(curenv->env_procstack_top);
+			--(curenv->env_sigstack_top);
+			for(; i<curenv->env_sigstack_top; ++i){
+				curenv->env_sigstack[i] = curenv->env_sigstack[i+1];
+			}
+			break;
+		}
+	}
+}
+
 
 void env_check() {
 	struct Env *pe, *pe0, *pe1, *pe2;

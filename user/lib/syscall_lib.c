@@ -74,3 +74,20 @@ int syscall_read_dev(void *va, u_int dev, u_int len) {
 	/* Exercise 5.2: Your code here. (2/2) */
 	return msyscall(SYS_read_dev, va, dev, len);
 }
+
+
+int syscall_sigaction(int signum, const struct sigaction *act, struct sigaction *oldact) {
+	return msyscall(SYS_sigaction, signum, act, oldact);
+}
+
+int syscall_sigprocmask(int how, const struct sigset_t *set, struct sigset_t *oldset){
+	return msyscall(SYS_sigprocmask, how, set, oldset);
+}
+
+int syscall_kill(u_int envid, int sig) {
+	return msyscall(SYS_kill, envid, sig);
+}
+
+void syscall_quit() {
+	msyscall(SYS_quit);
+}
