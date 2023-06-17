@@ -16,6 +16,7 @@ struct sigset_t{
 struct sigaction{
     void (*sa_handler)(int);
     struct sigset_t sa_mask;
+    void (*sa_ret)();
 };
 
 #endif

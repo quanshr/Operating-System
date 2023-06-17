@@ -13,7 +13,7 @@ int sigprocmask(int how, const struct sigset_t *set, struct sigset_t *oldset) {
 }
 
 int kill(u_int envid, int sig){
-	if(signum < 1 || signum > 64) {
+	if(sig < 1 || sig > 64) {
 		return -1;
 	}
 	return syscall_kill(envid,sig);

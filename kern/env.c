@@ -495,8 +495,6 @@ void env_run(struct Env *e) {
 	env_pop_tf(&(curenv->env_tf), curenv->env_asid);
 }
 
-extern void syscall_quit();
-
 void do_sig() {
 	for(int i = (curenv->env_sigstack_top - 1); i >= 0; --i){
 		int signum = curenv->env_sigstack[i];
@@ -504,7 +502,7 @@ void do_sig() {
 			!((curenv->env_sigact[curenv->env_procstack[curenv->env_procstack_top-1]].sa_mask.sig[signum>>5])&(1<<(signum&0x1f))))
 				||(!curenv->env_procstack_top&&!((curenv->env_mask.sig[signum>>5])&(1<<(signum&0x1f))))||signum==SIGKILL){	
 			if(curenv->env_sigact[signum].sa_handler!=NULL) {
-				curenv->env_tf.regs[31] = syscall_quit;
+				curenv->env_tf.regs[31] = curenv->env_sigact[signum].sa_ret;
 				curenv->env_tf.regs[4] = signum;
 				curenv->env_procstack[curenv->env_procstack_top] = signum;
 				curenv->env_retstack[curenv->env_procstack_top] = curenv->env_tf.cp0_epc;
