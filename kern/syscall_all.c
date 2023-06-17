@@ -545,6 +545,55 @@ int sys_read_dev(u_int va, u_int pa, u_int len) {
 	return 0;
 }
 
+
+#include <../user/include/sig.h>
+
+int sys_sigaction(int signum, const struct sigaction *act, struct sigaction *oldact){
+	if (oldact!=NULL) {
+		*oldact=curenv->env_sigact[signum];
+	}
+	curenv->env_sigact[signum] = *act;
+	return 0;
+}
+int sys_sigprocmask(int how, const struct sigset_t *set, struct sigset_t *oldset){
+	if (oldset != NULL){
+		*oldset = curenv->env_mask;
+	}
+	switch (how) {
+		case 0:
+			curenv->env_mask.sig[0] |= set->sig[0];
+			curenv->env_mask.sig[1] |= set->sig[1];
+			break;
+		case 1:
+			curenv->env_mask.sig[0] &= (~(set->sig[0]));
+            curenv->env_mask.sig[1] &= (~(set->sig[1]));
+			break;
+		case 2:
+			curenv->env_mask.sig[0] = set->sig[0];
+            curenv->env_mask.sig[1] = set->sig[1];
+			break;
+	}
+	return 0;
+}
+
+int sys_kill(u_int envid, int sig) {
+	struct Env *e;
+	try(envid2env(envid,&e,0));
+	e->env_sigstack[e->env_sigstack_top] = sig;
+	++(e->env_sigstack_top);
+	return 0;
+}
+
+void sys_quit(){
+	--(curenv->env_procstack_top);
+}
+
+
+
+
+
+
+
 void *syscall_table[MAX_SYSNO] = {
     [SYS_putchar] = sys_putchar,
     [SYS_print_cons] = sys_print_cons,
@@ -617,45 +666,3 @@ void do_syscall(struct Trapframe *tf) {
 
 
 
-// Lab 4 challenge
-#include <../user/include/sig.h>
-
-int sys_sigaction(int signum, const struct sigaction *act, struct sigaction *oldact){
-	if (oldact!=NULL) {
-		*oldact=curenv->env_sigact[signum];
-	}
-	curenv->env_sigact[signum] = *act;
-	return 0;
-}
-int sys_sigprocmask(int how, const struct sigset_t *set, struct sigset_t *oldset){
-	if (oldset != NULL){
-		*oldset = curenv->env_mask;
-	}
-	switch (how) {
-		case 0:
-			curenv->env_mask.sig[0] |= set->sig[0];
-			curenv->env_mask.sig[1] |= set->sig[1];
-			break;
-		case 1:
-			curenv->env_mask.sig[0] &= (~(set->sig[0]));
-            curenv->env_mask.sig[1] &= (~(set->sig[1]));
-			break;
-		case 2:
-			curenv->env_mask.sig[0] = set->sig[0];
-            curenv->env_mask.sig[1] = set->sig[1];
-			break;
-	}
-	return 0;
-}
-
-int sys_kill(u_int envid, int sig) {
-	struct Env *e;
-	try(envid2env(envid,&e,0));
-	e->env_sigstack[e->env_sigstack_top] = sig;
-	++(e->env_sigstack_top);
-	return 0;
-}
-
-void sys_quit(){
-	--(curenv->env_procstack_top);
-}

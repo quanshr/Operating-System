@@ -5,6 +5,8 @@
 #define SIGSEGV 11
 #define SIGTERM 15
 
+typedef struct sigset_t sigset_t;
+
 struct sigset_t{
     int sig[2]; //最多 32*2=64 种信号
 };
