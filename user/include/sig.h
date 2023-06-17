@@ -1,6 +1,8 @@
 #ifndef _SIG_H_
 #define _SIG_H_
 
+#define NSIG 64
+
 #define SIGKILL 9
 #define SIGSEGV 11
 #define SIGTERM 15

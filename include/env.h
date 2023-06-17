@@ -42,11 +42,12 @@ struct Env {
 
 
 	// Lab 4 challenge
-	struct sigaction env_sigact[64];
+	struct sigaction env_sigact[NSIG];
 	struct sigset_t env_mask;
-	int env_sigstack[8];
+	int env_sigstack[NSIG];
 	int env_sigstack_top;
-	int env_procstack[8];
+	int env_procstack[NSIG];
+	int env_retstack[NSIG];
 	int env_procstack_top;
 };
 

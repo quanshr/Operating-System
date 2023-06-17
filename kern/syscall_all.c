@@ -586,8 +586,9 @@ int sys_kill(u_int envid, int sig) {
 
 void sys_quit(){
 	--(curenv->env_procstack_top);
+	curenv->env_tf.cp0_epc=curenv->env_retstack[curenv->env_procstack_top];
+	env_pop_tf(&(curenv->env_tf),curenv->env_asid);
 }
-
 
 
 
