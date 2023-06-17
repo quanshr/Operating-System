@@ -55,7 +55,7 @@ int kill(u_int envid, int sig){
 	if (sig > 64|| sig < 1)	{
 		return -1;
 	}
-	return syscall_kill(envid,sig);
+	return syscall_kill(envid, sig);
 }
 void quit(){
 	syscall_quit();

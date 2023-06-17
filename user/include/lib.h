@@ -119,6 +119,12 @@ int remove(const char *path);
 int ftruncate(int fd, u_int size);
 int sync(void);
 
+// challenge
+int syscall_sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
+int syscall_sigprocmask(int how, const struct sigset_t *set, struct sigset_t *oldset);
+int syscall_kill(u_int envid, int sig);
+void syscall_quit();
+
 #define user_assert(x)                                                                             \
 	do {                                                                                       \
 		if (!(x))                                                                          \
