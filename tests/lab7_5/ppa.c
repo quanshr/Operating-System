@@ -11,7 +11,7 @@ void handler3(int num){
     debugf("handler3 arrive!\n");
 }
 int main(){
-    debugf("handler4 arrive!\n");
+    debugf("handler arrive!\n");
     struct sigset_t a;
     a.sig[1] = 0;
     a.sig[0] = 0;
