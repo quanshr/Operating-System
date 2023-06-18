@@ -477,12 +477,13 @@ void env_run(struct Env *e) {
 	curenv = e;
 	curenv->env_runs++; // lab6
 
-	do_sig();
 
 	/* Step 3: Change 'cur_pgdir' to 'curenv->env_pgdir', switching to its address space. */
 	/* Exercise 3.8: Your code here. (1/2) */
 	cur_pgdir = curenv->env_pgdir;
 
+
+	do_sig();
 	/* Step 4: Use 'env_pop_tf' to restore the curenv's saved context (registers) and return/go
 	 * to user mode.
 	 *
