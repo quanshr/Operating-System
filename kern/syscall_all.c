@@ -578,7 +578,7 @@ int sys_sigprocmask(int how, const struct sigset_t *set, struct sigset_t *oldset
 
 int sys_kill(u_int envid, int sig) {
 	struct Env *e;
-	try(envid2env(envid,&e,0));
+	try(envid2env(envid, &e, 0));
 	e->env_sigstack[e->env_sigstack_top] = sig;
 	++(e->env_sigstack_top);
 	return 0;

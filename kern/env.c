@@ -501,8 +501,8 @@ void do_sig() {
 		int signum = curenv->env_sigstack[i];
 		if((curenv->env_procstack_top && 
 			!((curenv->env_sigact[curenv->env_procstack[curenv->env_procstack_top-1]].sa_mask.sig[signum>>5])&(1<<(signum&0x1f))))
-				||(!curenv->env_procstack_top&&!((curenv->env_mask.sig[signum>>5])&(1<<(signum&0x1f))))||signum==SIGKILL){	
-			if(curenv->env_sigact[signum].sa_handler!=NULL) {
+				|| (!curenv->env_procstack_top && !((curenv->env_mask.sig[signum>>5])&(1<<(signum&0x1f))))||signum==SIGKILL){	
+			if(curenv->env_sigact[signum].sa_handler != NULL) {
 				curenv->env_tf.regs[31] = curenv->env_sigact[signum].sa_ret;
 				curenv->env_tf.regs[4] = signum;
 				curenv->env_procstack[curenv->env_procstack_top] = signum;
@@ -511,8 +511,8 @@ void do_sig() {
 				++(curenv->env_procstack_top);
 			}
 			--(curenv->env_sigstack_top);
-			for(;i<curenv->env_sigstack_top;++i) {
-				curenv->env_sigstack[i] = curenv->env_sigstack[i+1];
+			for(; i<curenv->env_sigstack_top; ++i) {
+				curenv->env_sigstack[i] = curenv->env_sigstack[i + 1];
 			}
 			if((signum == SIGKILL || signum == SIGSEGV || signum == SIGTERM) 
 				&& curenv->env_sigact[signum].sa_handler == NULL) {
