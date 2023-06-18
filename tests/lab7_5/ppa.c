@@ -1,16 +1,17 @@
 #include <lib.h>
 void handler1(int num){
-kill(0,2);
-debugf("handler1 arrive!\n");
+    kill(0, 2);
+    debugf("handler1 arrive!\n");
 }
 void handler2(int num){
-kill(0,3);
-debugf("handler2 arrive!\n");
+    kill(0,3);
+    debugf("handler2 arrive!\n");
 }
 void handler3(int num){
-debugf("handler3 arrive!\n");
+    debugf("handler3 arrive!\n");
 }
 int main(){
+    debugf("handler4 arrive!\n");
     struct sigset_t a;
     a.sig[1] = 0;
     a.sig[0] = 0;
